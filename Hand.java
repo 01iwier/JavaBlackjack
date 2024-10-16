@@ -26,6 +26,10 @@ public class Hand {
         return total;
     }
 
+    public int getHiddenTotal() {
+        return hand.getLast().getCardValue();
+    }
+
     public void print(boolean hideFirst) {
         for (int i = 0; i < hand.size(); i++) {
             if (i == 0 && hideFirst) {
@@ -36,7 +40,7 @@ public class Hand {
         }
     }
 
-    public void resetHand() {
+    public void clear() {
         hand.clear();
     }
     
