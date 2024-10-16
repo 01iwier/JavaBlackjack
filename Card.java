@@ -2,7 +2,7 @@ public class Card {
     private char suit;
     private String value;
 
-    public Card(String value, char suit) {
+    public Card(char suit, String value) {
         this.suit = suit;
         this.value = value;
     }
@@ -22,31 +22,14 @@ public class Card {
             case "J": case "Q": case "K":
                 return 10;
             case "A":
-                return 11; // Treat Ace as 11, Use Hand.containsAce() method to reduce by 10 later
+                return 11;
             default:
                 return 0;
         }
     }
 
     public String toString() {
-        String suitSymbol;
-        switch (suit) {
-            case 'H':
-            suitSymbol = "♥";
-            break;
-        case 'D':
-            suitSymbol = "♦";
-            break;
-        case 'C':
-            suitSymbol = "♣";
-            break;
-        case 'S':
-            suitSymbol = "♠";
-            break;
-        default:
-            suitSymbol = String.valueOf(suit);
-        }
-        return value + suitSymbol;
+        return value + suit;
     }
     
 }

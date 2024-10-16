@@ -20,6 +20,9 @@ public class Blackjack {
         Scanner scanner = new Scanner(System.in);
         boolean playerBust = false;
 
+        playerHand.addCard(deck.dealCard());
+        playerHand.addCard(deck.dealCard());
+        playerHand.print(false);
 
     }
 }
