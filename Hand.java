@@ -1,10 +1,14 @@
 import java.util.*;
 
 public class Hand {
-    private List<Card> hand = new ArrayList<>();
+    private ArrayList<Card> hand = new ArrayList<>();
 
     public void addCard(Card card) {
         hand.add(card);
+    }
+
+    public ArrayList<Card> getCards() {
+        return hand;  // New method to return the list of cards
     }
 
     public int getTotal() {
@@ -28,16 +32,6 @@ public class Hand {
 
     public int getHiddenTotal() {
         return hand.getLast().getCardValue();
-    }
-
-    public void print(boolean hideFirst) {
-        for (int i = 0; i < hand.size(); i++) {
-            if (i == 0 && hideFirst) {
-                System.out.print("__" + " ");
-            } else {
-                System.out.print(hand.get(i) + " ");
-            }
-        }
     }
 
     public void clear() {
