@@ -13,10 +13,27 @@ public class Blackjack extends JFrame {
     private JButton newGameButton;
     private JLabel statusLabel;
     private JLabel playerTotalLabel;
+    private JLabel playerBetLabel;
     private boolean revealDealerCard = false;
+    private double playerBalance = 100;
 
     public static void main(String[] args) {
         new Blackjack();
+    }
+
+    class BackgroundPanel extends JPanel {
+        private Image backgroundImage;
+
+        public BackgroundPanel(String filePath) {
+            System.out.println(filePath);
+            backgroundImage = new ImageIcon(filePath).getImage();
+        }
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
+        }
     }
 
     public Blackjack() {
@@ -31,12 +48,17 @@ public class Blackjack extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         playerPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10));
+        playerPanel.setOpaque(false);
         dealerPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10));
+        dealerPanel.setOpaque(false);
         statusLabel = new JLabel("Game In Progress", JLabel.CENTER);
         statusLabel.setFont(new Font("Arial", Font.BOLD, 15));
         playerTotalLabel = new JLabel("Total", JLabel.CENTER);
         playerTotalLabel.setFont(new Font("Arial", Font.BOLD, 40));
-        
+        playerTotalLabel.setForeground(Color.WHITE);
+        playerBetLabel = new JLabel("Bet", JLabel.CENTER);
+        playerBetLabel.setFont(new Font("Arial", Font.BOLD, 30));
+        playerBetLabel.setForeground(Color.WHITE);
         hitButton = new JButton("Hit");
         standButton = new JButton("Stand");
         newGameButton = new JButton("New Game");
@@ -68,24 +90,31 @@ public class Blackjack extends JFrame {
         buttonPanel.add(newGameButton);
 
         // Using BoxLayout for better dynamic spacing for labels
-        JPanel handsPanel = new JPanel();
+        BackgroundPanel handsPanel = new BackgroundPanel("assets/background.jpg");
         handsPanel.setLayout(new BoxLayout(handsPanel, BoxLayout.Y_AXIS));
 
         // Dealer's section (Label and cards)
         JPanel dealerSection = new JPanel();
         dealerSection.setLayout(new BoxLayout(dealerSection, BoxLayout.Y_AXIS));
         dealerSection.add(dealerPanel);
+        dealerSection.setOpaque(false);
 
         // Player's section (Label and cards)
         JPanel playerSection = new JPanel();
         playerSection.setLayout(new BoxLayout(playerSection, BoxLayout.Y_AXIS));
         playerSection.add(playerPanel);
-        playerSection.add(playerTotalLabel);
+        playerSection.setOpaque(false);
+
+        JPanel infoSection = new JPanel();
+        infoSection.setLayout(new BoxLayout(infoSection, BoxLayout.Y_AXIS));
+        infoSection.add(playerTotalLabel);
+        infoSection.add(playerBetLabel);
+        infoSection.setOpaque(false);
 
         // Adding sections to handsPanel
         handsPanel.add(dealerSection);
         handsPanel.add(playerSection);
-        handsPanel.add(playerTotalLabel);
+        handsPanel.add(infoSection);
 
         // Add components to the main frame
         add(handsPanel, BorderLayout.CENTER);       // Player and Dealer hands
@@ -96,6 +125,7 @@ public class Blackjack extends JFrame {
     }
 
     public void startGame() {
+        playerBalance--;
         playerHand.addCard(deck.dealCard());
         dealerHand.addCard(deck.dealCard());
         playerHand.addCard(deck.dealCard());
@@ -109,10 +139,15 @@ public class Blackjack extends JFrame {
         boolean dealerHasBlackjack = dealerHand.getTotal() == 21;
     
         if (playerHasBlackjack && dealerHasBlackjack) {
+            revealDealerCard = true;
+            updateDisplay();
             statusLabel.setText("Push! Player and Dealer have Blackjack.");
             endRound();
         } else if (playerHasBlackjack) {
+            revealDealerCard = true;
+            updateDisplay();
             statusLabel.setText("Player Blackjack!");
+            playerBalance += 2.5;
             endRound();
         } else if (dealerHasBlackjack) {
             revealDealerCard = true; // Reveal dealer's hidden card if they have Blackjack
@@ -125,13 +160,13 @@ public class Blackjack extends JFrame {
     private void playerHit() {
         playerHand.addCard(deck.dealCard());
         updateDisplay();
-        
         if (playerHand.getTotal() > 21) {
             statusLabel.setText("Player Busted! Dealer Wins.");
             hitButton.setEnabled(false);
             standButton.setEnabled(false);
             newGameButton.setEnabled(true);
         }
+        checkForBlackjack();
     }
 
     private void playerStand() {
@@ -156,12 +191,15 @@ public class Blackjack extends JFrame {
 
         if (dealerTotal > 21) {
             statusLabel.setText("Dealer Busted! Player Wins!");
+            playerBalance += 2;
         } else if (playerTotal > dealerTotal) {
             statusLabel.setText("Player Wins!");
+            playerBalance += 2;
         } else if (playerTotal < dealerTotal) {
             statusLabel.setText("Dealer Wins!");
         } else {
             statusLabel.setText("Push!");
+            playerBalance++;
         }
         newGameButton.setEnabled(true);
     }
@@ -186,7 +224,8 @@ public class Blackjack extends JFrame {
             }
         }
 
-        playerTotalLabel.setText(String.valueOf(playerHand.getTotal()));
+        playerTotalLabel.setText("       " + String.valueOf(playerHand.getTotal()));
+        playerBetLabel.setText("Balance = " + playerBalance);
 
         // Refresh the frame
         playerPanel.revalidate();
